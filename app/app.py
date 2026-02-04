@@ -4,7 +4,7 @@ from datetime import datetime
 import socket
 
 app = Flask(__name__)
-SERVER_IP = socket.gethostbyname(socket.gethostname())
+SERVER_NAME = socket.gethostname()
 
 def get_db():
     return mysql.connector.connect(
@@ -27,13 +27,13 @@ def index():
     client_ip = request.remote_addr
     cur.execute(
         "INSERT INTO access_log (access_time, client_ip, server_ip) VALUES (%s, %s, %s)",
-        (datetime.now(), client_ip, SERVER_IP)
+        (datetime.now(), client_ip, SERVER_NAME)
     )
     db.commit()
 
     # cookie ל-5 דקות
-    resp = make_response(SERVER_IP)
-    resp.set_cookie("server_ip", SERVER_IP, max_age=300)
+    resp = make_response(SERVER_NAME)
+    resp.set_cookie("server_ip", SERVER_NAME, max_age=300)
     return resp
 
 @app.route("/showcount")
