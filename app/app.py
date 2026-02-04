@@ -8,7 +8,7 @@ SERVER_NAME = socket.gethostname()
 
 def get_db():
     return mysql.connector.connect(
-        host="db",      # השם של service ב-docker-compose
+        host="db",      
         user="root",
         password="root",
         database="appdb"
@@ -19,19 +19,16 @@ def index():
     db = get_db()
     cur = db.cursor()
 
-    # +1 ל-counter
     cur.execute("UPDATE counter SET value = value + 1 WHERE id=1")
     db.commit()
 
-    # רישום access_log
     client_ip = request.remote_addr
     cur.execute(
         "INSERT INTO access_log (access_time, client_ip, server_ip) VALUES (%s, %s, %s)",
         (datetime.now(), client_ip, SERVER_NAME)
     )
     db.commit()
-
-    # cookie ל-5 דקות
+    
     resp = make_response(SERVER_NAME)
     resp.set_cookie("server_ip", SERVER_NAME, max_age=300)
     return resp
